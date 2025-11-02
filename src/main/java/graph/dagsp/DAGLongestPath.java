@@ -1,6 +1,6 @@
 package graph.dagsp;
 
-import graph.topo.TopologicalSorter;
+import graph.topo.TopologicalSort;
 import java.util.*;
 
 public class DAGLongestPath {
