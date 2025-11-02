@@ -1,63 +1,78 @@
 package graph.scc;
 
+import graph.utils.BasicMetrics;
+import graph.utils.Metrics;
+
 import java.util.*;
 
 public class TarjanSCC {
-    private final Graph graph;
-    private final int[] ids, low;
-    private final boolean[] onStack;
-    private final Deque<Integer> stack = new ArrayDeque<>();
-    private final List<List<Integer>> sccs = new ArrayList<>();
+    private final int V;
+    private final List<List<Integer>> adj;
+    private int time = 0;
+    private final int[] disc;
+    private final int[] low;
+    private final boolean[] stackMember;
+    private final Deque<Integer> stack;
+    private final List<List<Integer>> components = new ArrayList<>();
 
-    private int id = 0;
-    private int sccCount = 0;
+    private final Metrics metrics = new BasicMetrics();
 
-    public TarjanSCC(Graph g) {
-        this.graph = g;
-        int n = g.size();
-        ids = new int[n];
-        low = new int[n];
-        onStack = new boolean[n];
-        Arrays.fill(ids, -1);
+    public TarjanSCC(int V) {
+        this.V = V;
+        adj = new ArrayList<>();
+        for (int i = 0; i < V; i++) adj.add(new ArrayList<>());
+        disc = new int[V];
+        low = new int[V];
+        stackMember = new boolean[V];
+        stack = new ArrayDeque<>();
+    }
 
-        for (int i = 0; i < n; i++) {
-            if (ids[i] == -1)
+    public void addEdge(int u, int v) {
+        adj.get(u).add(v);
+    }
+
+    public List<List<Integer>> run() {
+        metrics.start();
+        Arrays.fill(disc, -1);
+        Arrays.fill(low, -1);
+        for (int i = 0; i < V; i++) {
+            if (disc[i] == -1)
                 dfs(i);
         }
+        metrics.stop();
+
+        System.out.println("TarjanSCC time: " + metrics.getTime() + " ms");
+        System.out.println("Counters: " + metrics.getCounters());
+        return components;
     }
 
-    private void dfs(int at) {
-        stack.push(at);
-        onStack[at] = true;
-        ids[at] = low[at] = id++;
+    private void dfs(int u) {
+        metrics.increment("dfs_visit");
 
-        for (int to : graph.neighbors(at)) {
-            if (ids[to] == -1) {
-                dfs(to);
-                low[at] = Math.min(low[at], low[to]);
-            } else if (onStack[to]) {
-                low[at] = Math.min(low[at], ids[to]);
+        disc[u] = low[u] = ++time;
+        stack.push(u);
+        stackMember[u] = true;
+
+        for (int v : adj.get(u)) {
+            metrics.increment("edge");
+            if (disc[v] == -1) {
+                dfs(v);
+                low[u] = Math.min(low[u], low[v]);
+            } else if (stackMember[v]) {
+                low[u] = Math.min(low[u], disc[v]);
             }
         }
 
-        if (ids[at] == low[at]) {
+        // head node found
+        if (low[u] == disc[u]) {
             List<Integer> component = new ArrayList<>();
-            while (true) {
-                int node = stack.pop();
-                onStack[node] = false;
-                component.add(node);
-                if (node == at) break;
-            }
-            sccs.add(component);
-            sccCount++;
+            int w;
+            do {
+                w = stack.pop();
+                stackMember[w] = false;
+                component.add(w);
+            } while (w != u);
+            components.add(component);
         }
-    }
-
-    public List<List<Integer>> getSCCs() {
-        return sccs;
-    }
-
-    public int getSccCount() {
-        return sccCount;
     }
 }

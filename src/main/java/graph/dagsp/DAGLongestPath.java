@@ -3,13 +3,13 @@ package graph.dagsp;
 import graph.topo.TopologicalSorter;
 import java.util.*;
 
-public class DagLongestPath {
+public class DAGLongestPath {
     private final WeightedGraph dag;
     private final double[] dist;
     private final int[] prev;
     private final List<Integer> order;
 
-    public DagLongestPath(WeightedGraph dag, int source) {
+    public DAGLongestPath(WeightedGraph dag, int source) {
         this.dag = dag;
         int n = dag.size();
         dist = new double[n];
