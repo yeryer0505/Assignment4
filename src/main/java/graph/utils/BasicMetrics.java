@@ -25,7 +25,7 @@ public class BasicMetrics implements Metrics {
 
     @Override
     public long getTime() {
-        return (endTime - startTime) / 1_000_000;
+        return (endTime - startTime) / 1_000_000; // milliseconds
     }
 
     @Override

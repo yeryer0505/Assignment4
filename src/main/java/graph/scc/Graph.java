@@ -13,6 +13,9 @@ public class Graph {
     }
 
     public void addEdge(int from, int to) {
+        if (from < 0 || from >= n || to < 0 || to >= n) {
+            throw new IllegalArgumentException("Vertex out of bounds");
+        }
         adj.get(from).add(to);
     }
 

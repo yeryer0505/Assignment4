@@ -28,6 +28,9 @@ public class TarjanSCC {
     }
 
     public void addEdge(int u, int v) {
+        if (u < 0 || u >= V || v < 0 || v >= V) {
+            throw new IllegalArgumentException("Vertex out of bounds");
+        }
         adj.get(u).add(v);
     }
 
@@ -36,13 +39,14 @@ public class TarjanSCC {
         Arrays.fill(disc, -1);
         Arrays.fill(low, -1);
         for (int i = 0; i < V; i++) {
-            if (disc[i] == -1)
-                dfs(i);
+            if (disc[i] == -1) dfs(i);
         }
         metrics.stop();
 
         System.out.println("TarjanSCC time: " + metrics.getTime() + " ms");
         System.out.println("Counters: " + metrics.getCounters());
+        System.out.println("Components: " + components);
+
         return components;
     }
 
@@ -63,7 +67,6 @@ public class TarjanSCC {
             }
         }
 
-        // head node found
         if (low[u] == disc[u]) {
             List<Integer> component = new ArrayList<>();
             int w;
